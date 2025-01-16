@@ -1,19 +1,30 @@
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+import random
+#from webdriver_manager.chrome import ChromeDriverManager
+
+
+
+options = Options()
+options.headless = True
 
 
 ''' A Selenium Powered Web Scraper that enables me to scrape a used-cars website and scrape all the info from them: e.g. petrol amount, engine, model, etc..'''
 
-driver = webdriver.Chrome('chrome-linux64') # Opens chrome - powered by linux because im awesome - i dont know my pathway to chrome driver, so i let it search for it manually, if i add the pathway it would open faster..
-driver.get('https://www.carwow.co.uk/used-cars') # Carwow is the website im scraping
-time.sleep(3) # Let the user actually see something! - dont close chrome too fast
+driver = webdriver.Chrome(options=options) # Opens chrome - powered by linux because im awesome - i dont know my pathway to chrome driver, so i let it search for it manually, if i add the pathway it would open faster..
+driver.get("https://www.carwow.co.uk/used-cars") # Carwow/used-cars is the website im scraping - will move deeper
+time.sleep(random.uniform(2, 5)) # Let the user actually see something! - dont close chrome too fast
 driver.execute_script(" window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })", "")
-time.sleep(3)
+time.sleep(random.uniform(2, 5))
 
 
 # finds the general class (BY classname) that holds all the info as named below
 my_variable = driver.find_elements(By.CLASS_NAME, "card-generic__ctas") 
+# submit_button = driver.find_element(By.ID, "accept")
+
+# submit_button.click()
 
 ''' This scrapes all the links of the 12 cars on the first page of the website '''
 links = []
@@ -24,12 +35,35 @@ for linkWrapper in my_variable:
 print(links)
 
     
-time.sleep(5) # add a breakpoint here and 'Run and Debug' - will enable you to run commands in the terminal (examples below) and Chrome wont close
+time.sleep(random.uniform(2, 5)) # add a breakpoint here and 'Run and Debug' - will enable you to run commands in the terminal (examples below) and Chrome wont close
 driver.quit()
 
+cars = []
+
+summaryinfo = []
+
+
+for link in links:
+    print(link)
+    driver.get("{link}")
 
 
 
+def scrape_one_car():
+    for link in links:
+        driver.get('{link}')
+        namodel = driver.find_elements(By.CLASS_NAME, "deal-title__model")
+        addmod = {"model": {namodel}}
+        cars.append(addmod)
+        summaryinfo = driver.find_elements(By.CLASS_NAME, "summary-list__item")
+        for item in summaryinfo:
+            summaryinfo.append(item.find_element(By.TAG_NAME, "dt"))
+
+
+
+print(cars)
+print(summaryinfo)
+scrape_one_car()
 
 
 ''' Some example commands you can run in the terminal to serach for desired items. '''
