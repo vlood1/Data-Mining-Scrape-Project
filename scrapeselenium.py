@@ -1,3 +1,58 @@
+import time
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import random
+
+options = Options()
+options.headless = True
+
+driver = webdriver.Chrome(options=options)
+driver.get("https://www.carwow.co.uk/used-cars")
+
+WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "card-genericctas")))
+driver.execute_script("window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })")
+
+time.sleep(random.uniform(2, 5))
+
+link_wrappers = driver.find_elements(By.CLASS_NAME, "card-genericctas")
+links = [wrapper.find_element(By.TAG_NAME, "a").get_attribute("href") for wrapper in link_wrappers]
+
+print(links)
+
+def scrape_one_car(link):
+    print(f"Scraping {link}")
+    driver.get(link)
+
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "deal-titlemodel")))
+    model = driver.find_element(By.CLASS_NAME, "deal-titlemodel").text
+
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "summary-listitem")))
+    summary_items = driver.find_elements(By.CLASS_NAME, "summary-listitem")
+
+    summary_info = {}
+    for item in summary_items:
+        key = item.find_element(By.TAG_NAME, "dt").text
+        value = item.find_element(By.TAG_NAME, "dd").text
+        summary_info[key] = value
+
+    car_details = {
+        "model": model,
+        "summary_info": summary_info
+    }
+    return car_details
+
+if links:
+    car_details = scrape_one_car(links[0])
+    print(car_details)
+
+driver.quit()
+
+
+
+
 # import time
 # from selenium import webdriver
 # from selenium.webdriver.common.by import By
@@ -71,56 +126,3 @@
 # # my_variable.text  - return text
 # # driver.find_element(By.CLASS_NAME, "name_of_my_class")  - find single element, error if doesn't find
 # # driver.find_elements(By.CLASS_NAME, "name_of_my_class") - find mulitple element, puts them in a list. empty list if no element found
-
-
-import time
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import random
-
-options = Options()
-options.headless = True
-
-driver = webdriver.Chrome(options=options)
-driver.get("https://www.carwow.co.uk/used-cars")
-
-WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "card-genericctas")))
-driver.execute_script("window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })")
-
-time.sleep(random.uniform(2, 5))
-
-link_wrappers = driver.find_elements(By.CLASS_NAME, "card-genericctas")
-links = [wrapper.find_element(By.TAG_NAME, "a").get_attribute("href") for wrapper in link_wrappers]
-
-print(links)
-
-def scrape_one_car(link):
-    print(f"Scraping {link}")
-    driver.get(link)
-
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "deal-titlemodel")))
-    model = driver.find_element(By.CLASS_NAME, "deal-titlemodel").text
-
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "summary-listitem")))
-    summary_items = driver.find_elements(By.CLASS_NAME, "summary-listitem")
-
-    summary_info = {}
-    for item in summary_items:
-        key = item.find_element(By.TAG_NAME, "dt").text
-        value = item.find_element(By.TAG_NAME, "dd").text
-        summary_info[key] = value
-
-    car_details = {
-        "model": model,
-        "summary_info": summary_info
-    }
-    return car_details
-
-if links:
-    car_details = scrape_one_car(links[0])
-    print(car_details)
-
-driver.quit()
