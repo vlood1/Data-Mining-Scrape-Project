@@ -36,34 +36,31 @@ print(links)
 
     
 time.sleep(random.uniform(2, 5)) # add a breakpoint here and 'Run and Debug' - will enable you to run commands in the terminal (examples below) and Chrome wont close
-driver.quit()
 
 cars = []
 
 summaryinfo = []
 
 
-for link in links:
+
+
+def scrape_one_car(link):
     print(link)
-    driver.get("{link}")
-
-
-
-def scrape_one_car():
-    for link in links:
-        driver.get('{link}')
-        namodel = driver.find_elements(By.CLASS_NAME, "deal-title__model")
-        addmod = {"model": {namodel}}
-        cars.append(addmod)
-        summaryinfo = driver.find_elements(By.CLASS_NAME, "summary-list__item")
-        for item in summaryinfo:
-            summaryinfo.append(item.find_element(By.TAG_NAME, "dt"))
+    driver.get(link)
+    namodel = driver.find_elements(By.CLASS_NAME, "deal-title__model")
+    addmod = {"model": namodel}
+    cars.append(addmod)
+    summaryinfo = driver.find_elements(By.CLASS_NAME, "summary-list__item")
+    for item in summaryinfo:
+        summaryinfo.append(item.find_element(By.TAG_NAME, "dt"))
 
 
 
 print(cars)
 print(summaryinfo)
-scrape_one_car()
+scrape_one_car(links[0])
+
+driver.quit()
 
 
 ''' Some example commands you can run in the terminal to serach for desired items. '''
